@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <title>
+            Login page
+        </title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+    </head>
+    <body>
+        <h1>Login</h1>
+        <ul>
+            <% if(messages.success_msg) { %>
+                <li><%=messages.success_msg %></li>
+            <% } %>
+        </ul>
+        <ul>
+            <% if(messages.error) { %>
+                <li><%=messages.error %></li>
+            <% } %>
+        </ul>
+        <form action="/login" method="POST">
+            <ul>
+            <!-- <li style="list-style: none;"><input type="text" id="name" name="name" placeholder="Enter Your name"></li> -->
+            <li style="list-style: none;"><input type="text" id="email" name="email" placeholder="Enter email"></li>
+            <li style="list-style: none;"><input type="text" id="password" name="password" placeholder="Enter Password"></li>
+            
+            </ul>
+            <button type="login">Login</button>
+            <p>Not an existing User? <a href="/" id="signup">Sign up</a></p>
+        </form>
+    </body>
+</html>
