@@ -2,6 +2,9 @@ const LocalStrategy = require('passport-local');
 const pool = require('./database');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
+var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
+
+//LOCAL STRATEGY
 
 
 const authenticateUser = (email,password,done) =>{
@@ -37,17 +40,55 @@ function initialize(passport){
     },authenticateUser))
 }
 
+
+
 passport.serializeUser((user,done)=>{
     done(null,user.id);
+    console.log("Passport Config");
 })
+
 
 passport.deserializeUser((id,done)=>{
     pool.query("SELECT * FROM user_table WHERE id = $1",[id],(err,result)=>{
         if(err){
             throw err;
         }
+        console.log("Passport deserial");
         return done(null,result.rows[0]);
+        
     })
 })
+
+
+
+
+//SERIALISE AND DESERIALIZE
+
+// passport.serializeUser((user,done)=>{
+//     done(null,user.id);
+//     console.log(user);
+// })
+
+// passport.deserializeUser((user,done)=>{
+//     done(null,user);
+// })
+
+// passport.deserializeUser((id,done)=>{
+//     pool.query("SELECT * FROM user_table WHERE id = $1",[id],(err,result)=>{
+//         if(err){
+//             throw err;
+//         }
+//         return done(null,result.rows[0]);
+//     })
+// })
+
+// passport.deserializeUser((user,done)=>{
+//     pool.query("SELECT * FROM oauth_table WHERE id = $1",[user.id],(err,result)=>{
+//         if(err){
+//             throw err;
+//         }
+//         return done(null,result.rows[0]);
+//     })
+// })
 
 module.exports = initialize;
