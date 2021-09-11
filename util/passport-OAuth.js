@@ -1,6 +1,7 @@
-const pool = require('./database');
+const pool = require('../util/database');
 const passport = require('passport');
 var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
+
 require('dotenv').config();
 
 
@@ -15,12 +16,14 @@ passport.use(new GoogleStrategy({
     passReqToCallback   : true
   },
   function(request, accessToken, refreshToken, profile, done) {
+      console.log("OAuth ran");
     
     pool.query("SELECT * FROM oauth_table WHERE email = ($1)",[profile.email],(err,result) => {
         if(err){
             throw err;
         }
         if(result.rows.length > 0){
+            console.log('OAuth eval success');
             return done(null, profile);
         }else{
             pool.query("INSERT INTO oauth_table (id,displayName,email) VALUES ($1,$2,$3) RETURNING id ",[profile.id,profile.displayName,profile.email]
@@ -35,7 +38,7 @@ passport.use(new GoogleStrategy({
             })
             return done(null, profile);
         }
-        console.log(result.rows);
+        
         
             
         
