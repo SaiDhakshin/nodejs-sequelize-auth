@@ -1,5 +1,6 @@
 const passport = require('passport');
 const bcrypt = require('bcrypt');
+const User = require('../models/User');
 
 const intializePassport = require('../util/passportConfig');
 
@@ -8,6 +9,7 @@ intializePassport(passport);
 exports.register = async (req,res) => {
     console.log(req.body);
     let {name , email , password , password2} = req.body;
+    const emaile = req.body.email;
     console.log(name , email , password , password2);
     let errors = [];
     if(!name || !email || !password || !password2){
@@ -23,27 +25,49 @@ exports.register = async (req,res) => {
         res.render("index" , {errors});
     }
     let hashedPassword = await bcrypt.hash(password,10);
-    pool.query("SELECT * FROM user_table WHERE email = ($1)",[email],(err,result) => {
-        if(err){
-            throw err;
-        }
-        console.log(result.rows);
-        if(result.rows.length > 0){
-            errors.push({message : "Email Exists!"});
+    User.findAll({ where : { email : emaile }}).then(users => {
+        if(users[0]){
+            console.log(users);
+            errors.push({message : "Email exists"});
             res.render("index",{errors});
         }else{
-            pool.query("INSERT INTO user_table (name,email,password) VALUES ($1,$2,$3) RETURNING id , password",[name,email,hashedPassword]
-            ,(err,result) => {
-                if(err){
-                    throw err;
-                }
-                console.log(result.rows);
-                req.flash('success_msg' , "You are now registered . Please Login");
-                res.redirect("/login");
-                
+            User.create({
+                name : name,
+                email : email,
+                password : hashedPassword
+            }).then( result => {
+                console.log(result);
             })
+            .catch(err => {
+                console.log(err);
+            })
+            req.flash('success_msg' , "You are now registered . Please Login");
+            res.redirect("/login");
+
         }
+    }).catch(err => {
+        console.log(err);
     })
+    // pool.query("SELECT * FROM user_table WHERE email = ($1)",[email],(err,result) => {
+    //     if(err){
+    //         throw err;
+    //     }
+    //     console.log(result.rows);
+    //     if(result.rows.length > 0){
+    //         errors.push({message : "Email Exists!"});
+    //         res.render("index",{errors});
+    //     }else{
+    //         pool.query("INSERT INTO user_table (name,email,password) VALUES ($1,$2,$3) RETURNING id , password",[name,email,hashedPassword]
+    //         ,(err,result) => {
+    //             if(err){
+    //                 throw err;
+    //             }
+    //             console.log(result.rows);
+    
+    //         })
+    //     }
+    // })
+    
 
     
     console.log(hashedPassword);

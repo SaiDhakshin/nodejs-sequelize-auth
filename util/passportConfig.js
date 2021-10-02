@@ -2,20 +2,17 @@ const LocalStrategy = require('passport-local');
 const pool = require('../util/database');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-
+const User = require('../models/User');
 
 //LOCAL STRATEGY
 
 
 const authenticateUser = (email,password,done) =>{
-    pool.query("SELECT * FROM user_table WHERE email=($1)",[email],(err,result) => {
-        if(err){
-            throw err;
-        }
-        if(result.rows.length > 0){
-            const user = result.rows[0];
-            console.log(result.rows[0]);
 
+    User.findAll({where : {email : email}}).then(users => {
+        if(users[0]){
+            console.log(users[0]);
+            const user = users[0];
             bcrypt.compare(password,user.password,(err,isMatch)=>{
                 if(err){
                     throw err;
@@ -27,10 +24,38 @@ const authenticateUser = (email,password,done) =>{
                     return done(null,false,{message : "Password is not correct!"});
                 }
             })
-        }else{
+        }
+        else{
             return done(null,false,{message : "Email not registered!"});
         }
+    }).catch(err => {
+        console.log(err);
     })
+
+
+    // pool.query("SELECT * FROM user_table WHERE email=($1)",[email],(err,result) => {
+    //     if(err){
+    //         throw err;
+    //     }
+    //     if(result.rows.length > 0){
+    //         const user = result.rows[0];
+    //         console.log(result.rows[0]);
+
+    //         bcrypt.compare(password,user.password,(err,isMatch)=>{
+    //             if(err){
+    //                 throw err;
+    //             }
+    //             if(isMatch){
+    //                 console.log("Evaluation sucess!");
+    //                 return done(null,user);
+    //             }else{
+    //                 return done(null,false,{message : "Password is not correct!"});
+    //             }
+    //         })
+    //     }else{
+    //         return done(null,false,{message : "Email not registered!"});
+    //     }
+    // })
 }
 
 function initialize(passport){
@@ -49,15 +74,20 @@ passport.serializeUser((user,done)=>{
 
 
 passport.deserializeUser((id,done)=>{
-    pool.query("SELECT * FROM user_table WHERE id = $1",[id],(err,result)=>{
-        if(err){
-            throw err;
-        }
+    User.findAll({where : {id : id}}).then(users => {
+        return done(null,users[0]);
+
+    }).catch(err => {
+        console.log(err);
+    })
+    // pool.query("SELECT * FROM user_table WHERE id = $1",[id],(err,result)=>{
+    //     if(err){
+    //         throw err;
+    //     }
         console.log("Passport deserial");
-        return done(null,result.rows[0]);
         
     })
-})
+
 
 
 

@@ -1,4 +1,5 @@
 // const pool = require('./database');
+const sequelize = require('./util/sequelize');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const flash = require('express-flash');
@@ -6,6 +7,7 @@ const passport = require('passport');
 const fs = require('fs');
 require('./util/passport-OAuth');
 // require('./passport-OAuth');
+var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 
 const authRoutes = require('./routes/auth');
@@ -29,6 +31,13 @@ const port = 3000;
 // const intializePassport = require('./passportConfig');
 const cookieParser = require('cookie-parser');
 
+//encrypt session
+app.use(session ({
+    secret : 'secret',
+    resave : false,
+    saveUninitialized : false,
+    store: myStore
+}))
 
 
 //config
@@ -41,12 +50,12 @@ app.use(flash());
 
 app.use(cookieParser());
 
-//encrypt session
-app.use(session ({
-    secret : 'secret',
-    resave : false,
-    saveUninitialized : false
-}))
+var myStore = new SequelizeStore({
+    db: sequelize,
+  });
+
+
+
 
 
 
@@ -165,6 +174,21 @@ app.get('/videoplay',(req,res)=>{
     videoStream.pipe(res);
 });
 
+
+sequelize.sync()
+.then(result => {
+    console.log(result);
+})
+.catch(err => {
+    console.log(err);
+})
+
 app.listen(port , ()=>{
     console.log("Server started listening at" + port);
+})
+
+myStore.sync().then(result => {
+    console.log(result);
+}).catch(err =>{
+    console.log(err);
 })
