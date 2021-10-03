@@ -8,12 +8,21 @@
 </head>
 <body>
     <main>
+        <ul>
+            <% if(messages.success_msg) { %>
+                <li><%=messages.success_msg %></li>
+            <% } %>
+        </ul>
         
             <% if(p.length > 0) { %>
                 <ul>
                     <% p.forEach(prod => { %>
-               <h1><%= prod.title %></h1>   
-               <h2><%= prod.cartItem.quantity %></h2>      
+               <h6><%= prod.title %></h6>   
+               <li><form action="/addQtyCart" method="POST"><button>Add</button>
+                <input type="hidden" name="id" value="<%= prod.id%>">
+            </form><%= prod.cartItem.quantity %> <form action="/removeQtyCart" method="POST"><button>Subtract</button>
+                <input type="hidden" name="id" value="<%= prod.id%>">
+            </form></li>      
                 </ul>
             <% }) %>
 

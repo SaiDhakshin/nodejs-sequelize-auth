@@ -32,6 +32,10 @@ router.get("/cart",productController.getCart);
 
 router.post("/cart",productController.postCart);
 
+router.post("/addQtyCart",productController.addCartQty);
+
+router.post("/removeQtyCart",productController.removeQtyCart);
+
 router.post("/createorder",productController.postOrder);
 
 router.get("/orders",productController.getOrder);

@@ -8,6 +8,14 @@
     </head>
     <body>
         <h2>Products Page</h2>
+        <br>
+        <a href="/cart">Cart</a>
+
+        <ul>
+            <% if(messages.success_msg) { %>
+                <li><%=messages.success_msg %></li>
+            <% } %>
+        </ul>
         
         <div class="item-container">
             <% for(p of products) {%>

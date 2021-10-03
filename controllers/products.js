@@ -43,6 +43,8 @@ exports.postAddProducts = async (req,res)=>{
         console.log(result);
         console.log(result.dataValues);
         req.flash('success_msg',result.dataValues.title + ' Product successfully Added');
+        console.log('/admin/add-product works');
+        res.redirect("/admin/add-products");  
     }).catch(err =>{
         console.log(err);
     })
@@ -53,8 +55,7 @@ exports.postAddProducts = async (req,res)=>{
        
     // });
     
-    console.log('/admin/add-product works');
-    res.redirect("/admin/add-products");    
+     
 }
 
 exports.getProducts =async (req,res)=>{
@@ -178,10 +179,20 @@ exports.postCart = async (req,res) => {
         
         .then(() =>{
             console.log("Cart Redirect");
-            res.redirect("/cart");
+            req.flash('success_msg',' Product successfully Added');
+            res.redirect("/products");
         })
         
-        .catch(err =>{
+        .catch(err =>{const id = req.body.id;
+            console.log(id);
+            let fetchedCart ;
+            let newQuantity = 1;
+            req.user.getCart()
+            .then(cart =>{
+                fetchedCart = cart;
+                console.log(fetchedCart);
+                return cart.getProducts({where : {id : id}});
+            })
             console.log(err);
         })
    
@@ -189,6 +200,108 @@ exports.postCart = async (req,res) => {
     // Product.findById(id , (product) =>{
     //     Cart.addProduct(id , product.price);
     // })
+}
+
+exports.addCartQty = (req,res) => {
+    GUser.findByPk(req.session.userId).then(res => {
+        req.user = res;
+        console.log(res);
+    })
+    .catch(err => {
+        console.log(err);
+    })
+    const id = req.body.id;
+    console.log(id);
+    let fetchedCart ;
+    req.user.getCart()
+    .then(cart =>{
+        fetchedCart = cart;
+        console.log(fetchedCart);
+        return cart.getProducts({where : {id : id}});
+    })
+    .then(p =>{
+        let product;
+        if(p.length > 0){
+            product = p[0];
+        }
+        
+        if(product){
+            const oldQuantity = product.cartItem.quantity;
+            newQuantity = oldQuantity + 1;
+            return product;
+        }
+        return Product.findByPk(id)
+        // .then(p =>{
+        //     return fetchedCart.addProduct(p , { through  : { quantity : newQuantity }});
+        // })
+    })
+        .then(p => {
+            return fetchedCart.addProduct(p , { through  : { quantity : newQuantity }});
+        })
+        
+        .then(() =>{
+            console.log("Cart Redirect");
+            req.flash('success_msg',' Qty successfully Added');
+            res.redirect("/cart");
+        })
+        
+        .catch(err =>{
+            console.log(err);
+        })
+}
+
+exports.removeQtyCart = (req,res) => {
+    let noQty;
+    GUser.findByPk(req.session.userId).then(res => {
+        req.user = res;
+        console.log(res);
+    })
+    .catch(err => {
+        console.log(err);
+    })
+    const id = req.body.id;
+    console.log(id);
+    let fetchedCart ;
+    req.user.getCart()
+    .then(cart =>{
+        fetchedCart = cart;
+        console.log(fetchedCart);
+        return cart.getProducts({where : {id : id}});
+    })
+    .then(p =>{
+        let product;
+        if(p.length > 0){
+            product = p[0];
+        }
+        
+        if(product){
+            const oldQuantity = product.cartItem.quantity;
+            newQuantity = oldQuantity - 1;
+            if(newQuantity < 1){
+                product.cartItem.destroy();
+            }
+            return product;
+        }
+        return Product.findByPk(id)
+        // .then(p =>{
+        //     return fetchedCart.addProduct(p , { through  : { quantity : newQuantity }});
+        // })
+    })
+        .then(p => {
+ 
+                return fetchedCart.addProduct(p , { through  : { quantity : newQuantity }});
+
+        })
+        
+        .then(() =>{
+            console.log("Cart Redirect");
+            req.flash('success_msg',' Qty successfully Deleted!');
+            res.redirect("/cart");
+        })
+        
+        .catch(err =>{
+            console.log(err);
+        })
 }
 
 exports.postDelete = async (req,res)=>{
