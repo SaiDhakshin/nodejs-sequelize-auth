@@ -20,7 +20,7 @@ passport.use(new GoogleStrategy({
       console.log("OAuth ran");
 
       GUser.findAll({where : {email : profile.email}}).then(users =>{
-          if(users > 0){
+          if(users[0]){
             console.log('OAuth eval success');
               return done(null, profile);
           }else{
@@ -71,6 +71,7 @@ passport.use(new GoogleStrategy({
 ));
 
 passport.serializeUser((user,done)=>{
+    console.log(user.id);
     done(null,user.id);
     console.log("OAuth");
 })

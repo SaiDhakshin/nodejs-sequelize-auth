@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+    <title>Add product</title>
+</head>
+<body>
+    <ul>
+        <% if(messages.success_msg) {%>
+        <li><%= messages.success_msg %></li>
+        <% } %>
+    </ul>
+    <main>
+        <h2><% if(edit) { %>Edit<%  }else{ %>Add <% } %></h2>
+        <% if(edit && prods) {%>
+            <form action="/admin/update" method="POST">
+                <input type="text" name="name" placeholder="Product name" value="<%= prods.title %>"> <br>
+                <input type="number" name="price" placeholder="Product price" value="<%= prods.price %>"> <br>
+                <input type="text" name="imageUrl" placeholder="Product ImageUrl" value="<%= prods.imageUrl %>"> <br>
+                <input type="text" name="description" placeholder="Product description" value="<%= prods.description %>"> <br>
+                <input type="hidden" name="id" value="<%= prods.id %>">
+                <button type="submit">Update</button>
+    </form>
+        <% } else{  %>
+            <form action="/admin/add-products" method="POST">
+                <input type="text" name="name" placeholder="Product name"> <br>
+                <input type="number" name="price" placeholder="Product price"> <br>
+                <input type="text" name="imageUrl" placeholder="Product ImageUrl"> <br>
+                <input type="text" name="description" placeholder="Product description"> <br>
+                <button type="submit">Add</button>
+            <% } %>
+    </main>
+</body>
+</html>

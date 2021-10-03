@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+    <title>Document</title>
+</head>
+<body>
+    <main>
+        <% if(p) {%>
+            <ul>
+                <li><%= p.title %></li>
+                <li><%= p.price %></li>
+                <li><%= p.imageUrl %></li>
+                <li><%= p.description %></li>
+                <button><a href="?edit=true">Edit</a></button>
+                <form action="/admin/delete/<%= p.id %>" method="POST">
+                    <button>Delete</button>
+                </form>
+            </ul>
+        <% } %>
+    </main>
+</body>
+</html>

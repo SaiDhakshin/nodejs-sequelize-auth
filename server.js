@@ -10,8 +10,17 @@ require('./util/passport-OAuth');
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 
+const User = require('./models/User');
+const Product = require("./models/products");
+const Cart = require("./models/cart");
+const CartItem = require("./models/cartItem");
+const Order = require("./models/order");
+const OrderItem = require("./models/orderItem");
+const GUser = require("./models/GUser");
+
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const adminRoutes = require('./routes/admin');
 
 
 //SMS
@@ -40,6 +49,8 @@ app.use(session ({
 }))
 
 
+
+
 //config
 app.set('view engine','ejs');
 
@@ -63,6 +74,29 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+// app.use((req,res ,next)=>{
+
+//     GUser.findAll({where : {}}).then(user => {
+//         req.user = user;
+//         next();
+//     }).catch(err => {
+//         console.log(err);
+//     })
+// })
+
+// app.use((req,res,next) => {
+//     const { userId } = req.session;
+//     if(userId){
+//         res.locals.user = GUser.findAll({where : {id : userId}}).then(res => {
+//             console.log(res);
+//         })
+//         .catch(err => {
+//             console.log(err);
+//         })
+//     }
+// })
+
+
 
 // intializePassport(passport);
 
@@ -70,6 +104,7 @@ app.use(passport.session());
 //Routes
 app.use(authRoutes);
 app.use(userRoutes);
+app.use("/admin",adminRoutes);
 
 
 
@@ -83,109 +118,57 @@ app.use(userRoutes);
 
 
 
-//SEND SMS
-app.get("/phone", (req,res) => {
-    res.render("phone");
-})
 
-app.post("/send",async (req,res) => {
-    console.log(req.body);
-    client.messages
-    .create({
-       body: 'Hello' + req.body.username,
-       from: twilioNumber,
-       to: '+91' + req.body.phonenumber
-     })
-    .then(message => console.log(message.sid));
-    res.send("Sent SMS");
-})
 
-app.get("/mail",(req,res) => {
-    res.render("mail");
-})
 
-app.post("/mail",async (req,res) => {
 
-    let transporter = nodemailer.createTransport({
-        host : "smtp.gmail.com",
-        port : 587,
-        secure : false,
-        auth : {
-            user : "saidhakshin75@gmail.com",
-            pass : "qmpzFGH4563",
-        },
-    });
 
-    const options = {
-        from : 'saidhakshin75@gmail.com',
-        to : '19p233@kce.ac.in',
-        subject : "Hello",
-        text : "Hello World?",
-        html : '<b>Hello World?</b>',
-    }
 
-    transporter.sendMail(options,function(err,info){
-        if(err){
-            console.log(err);
-            return;
-        }
-        console.log("sent:" + info.response);
+Product.belongsTo(User,{constraints : true , onDelete : 'CASCADE'});
+User.hasMany(Product);
+User.hasOne(Cart);
+Cart.belongsTo(User);
+Cart.belongsToMany(Product , {through : CartItem});
+Product.belongsToMany(Cart, {through: CartItem});
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product , {through : OrderItem});
 
-        console.log("Message sent : %s" , info.messageId);
+Product.belongsTo(GUser,{constraints : true , onDelete : 'CASCADE'});
+Cart.belongsTo(GUser);
+Order.belongsTo(GUser);
+GUser.hasMany(Product);
+GUser.hasOne(Cart);
+GUser.hasMany(Order);
+Order.belongsTo(GUser);
 
-        console.log("Preview URL : %s",nodemailer.getTestMessageUrl(info));
+sequelize
+// .sync({force : true})
+.sync()
+// .then(result => {
+//     return GUser.findAll({where : {id : require.session.userId}});
+// })
+// .then(user => {
+//     if(!user){
+//         console.log("Cannot find user");
+//     }
+//     return user;
+// })
+// .then(user => {
+//     console.log(user);
+//     return user.createCart();
+// })
+.then(cart =>{
+    console.log(cart);
+    app.listen(port , ()=>{
+        console.log("Server started listening at" + port);
     })
-
-  
-
-    res.send("Sent");
 })
-
-//VIDEO
-app.get("/video",(req,res) => {
-    res.render("video");
-})
-
-app.get('/videoplay',(req,res)=>{
-    console.log(req.headers.range);
-    const range = req.headers.range;
-    console.log(range);
-    if(!range){
-        res.status(400).send('Required header not found');
-    }
-    const videoPath = ("./videos/buggy.mp4");
-    const videoSize = fs.statSync("./videos/buggy.mp4").size;
-
-    const CHUNK_SIZE = 10 ** 6;//1mb
-    const start = Number(range.replace(/\D/g,""));
-    const end = Math.min(start + CHUNK_SIZE , videoSize-1);
-    const contentLength = end - start + 1;
-    const headers = {
-        "Content-Range" : `bytes ${start} - ${end} / ${videoSize}`,
-        "Accept-Ranges" : "bytes",
-        "Content-Length" : contentLength,
-        "Content-Type" : "video/mp4",
-    };
-
-    res.writeHead(206,headers);
-
-    const videoStream = fs.createReadStream(videoPath,{start,end});
-
-    videoStream.pipe(res);
-});
-
-
-sequelize.sync()
-.then(result => {
-    console.log(result);
-})
-.catch(err => {
+.catch(err=>{
     console.log(err);
 })
 
-app.listen(port , ()=>{
-    console.log("Server started listening at" + port);
-})
+
 
 myStore.sync().then(result => {
     console.log(result);
