@@ -7,6 +7,7 @@ const Sequelize = require('sequelize');
 
 
 
+
 const sequelize = require('../util/database');
 
 exports.getAddProducts =(req,res)=>{
@@ -17,7 +18,8 @@ exports.getAddProducts =(req,res)=>{
 
 exports.postAddProducts = async (req,res)=>{
     console.log(req.body);
-    let{name,price,imageUrl,description} = req.body;
+    let{name,price,description} = req.body;
+    let imageUrl = req.file;
     console.log(req.session.userId);
     GUser.findByPk(req.session.userId).then(res => {
         req.user = res;
@@ -26,10 +28,17 @@ exports.postAddProducts = async (req,res)=>{
     .catch(err => {
         console.log(err);
     })
+
+    if(!imageUrl){
+        req.flash('success_msg', 'Attached file not a valid image');
+        console.log('/admin/add-product works');
+        res.redirect("/admin/add-products"); 
+    }
+    const imagePath = imageUrl.path;
     req.user.createProduct({
         title : name,
         price : price,
-        imageUrl : imageUrl,
+        imageUrl : imagePath,
         description : description
     })
     //  Product.create({
@@ -321,11 +330,18 @@ exports.postDelete = async (req,res)=>{
 
 exports.postUpdate = async (req,res) =>{
     const id = req.body.id;
-    let{name,price,imageUrl,description} = req.body;
+    let{name,price,description} = req.body;
+    let imageUrl = req.file;
+    if(!imageUrl){
+        req.flash("success_msg","Not a valid image");
+        res.render('add-products',{edit : edit});
+    }
+
+    const imagePath = imageUrl.path;
     await Product.findByPk(id).then(product =>{
             product.title = name;
             product.price = price;
-            product.imageUrl = imageUrl;
+            product.imageUrl = imagePath;
             product.description = description;
              return product.save();
     })
@@ -366,6 +382,7 @@ exports.postOrder = (req,res) =>{
     })
     .then(result => {
         console.log(result);
+        console.log("Cart emptied");
         return fetchedCart.setProducts(null);
     })
     .then(result =>{

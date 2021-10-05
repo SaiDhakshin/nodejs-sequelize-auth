@@ -16,19 +16,19 @@
     <main>
         <h2><% if(edit) { %>Edit<%  }else{ %>Add <% } %></h2>
         <% if(edit && prods) {%>
-            <form action="/admin/update" method="POST">
+            <form action="/admin/update" method="POST" enctype="multipart/form-data">
                 <input type="text" name="name" placeholder="Product name" value="<%= prods.title %>"> <br>
                 <input type="number" name="price" placeholder="Product price" value="<%= prods.price %>"> <br>
-                <input type="text" name="imageUrl" placeholder="Product ImageUrl" value="<%= prods.imageUrl %>"> <br>
+                <input type="file" name="imageUrl" placeholder="Product ImageUrl" value=""> <br>
                 <input type="text" name="description" placeholder="Product description" value="<%= prods.description %>"> <br>
                 <input type="hidden" name="id" value="<%= prods.id %>">
                 <button type="submit">Update</button>
     </form>
         <% } else{  %>
-            <form action="/admin/add-products" method="POST">
+            <form action="/admin/add-products" method="POST" enctype="multipart/form-data">
                 <input type="text" name="name" placeholder="Product name"> <br>
                 <input type="number" name="price" placeholder="Product price"> <br>
-                <input type="text" name="imageUrl" placeholder="Product ImageUrl"> <br>
+                <input type="file" name="imageUrl" placeholder="Product Image"> <br>
                 <input type="text" name="description" placeholder="Product description"> <br>
                 <button type="submit">Add</button>
             <% } %>

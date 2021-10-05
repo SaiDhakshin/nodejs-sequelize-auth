@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
     <title>Cart</title>
 </head>
 <body>
@@ -15,21 +17,33 @@
         </ul>
         
             <% if(p.length > 0) { %>
-                <ul>
-                    <% p.forEach(prod => { %>
-               <h6><%= prod.title %></h6>   
-               <li><form action="/addQtyCart" method="POST"><button>Add</button>
-                <input type="hidden" name="id" value="<%= prod.id%>">
-            </form><%= prod.cartItem.quantity %> <form action="/removeQtyCart" method="POST"><button>Subtract</button>
-                <input type="hidden" name="id" value="<%= prod.id%>">
-            </form></li>      
-                </ul>
-            <% }) %>
+<div class="grid">
+    <ul>
+        <% p.forEach(prod => { %>
+            
+                <div class="card">
+                    <div class="cartItem">
+                        <h3><%= prod.title %></h3>
+                        <li><%= prod.cartItem.quantity %> </li>
+                        <li><form action="/addQtyCart" method="POST"><button class="btn">+</button>
+                            <input type="hidden" name="id" value="<%= prod.id%>">
+                        </form></li>   
+                        <li><form action="/removeQtyCart" method="POST"><button class="btn">-</button>
+                         <input type="hidden" name="id" value="<%= prod.id%>">
+                     </form></li>  
+                </div>  
+              </div> 
+            
+    </ul>
+<% }) %>
+</div>
 
             <% } %> 
-            <form action="/createorder" method="POST">
-                <button>Order Now</button>
-            </form>
+            <div class="centergrid">
+                <form action="/createorder" method="POST">
+                    <button >Order Now</button>
+                </form>
+            </div>
     </main>
 </body>
 </html>

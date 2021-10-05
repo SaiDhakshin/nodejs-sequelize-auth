@@ -8,6 +8,8 @@ const fs = require('fs');
 require('./util/passport-OAuth');
 // require('./passport-OAuth');
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
+const multer = require('multer');
+
 
 
 const User = require('./models/User');
@@ -49,13 +51,34 @@ app.use(session ({
 }))
 
 
+const fileStorage = multer.diskStorage({
+    destination : (req,file,cb) => {
+        cb(null,'./public/images');
+    },
+    filename : (req,file,cb) => {
+        cb(null,new Date().toISOString() + "-" + file.originalname);
+    }
+})
 
+const fileFilter = (req,file,cb) =>{
+    if(file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg'){
+
+        cb(null,true);
+    }else{
+
+        cb(null,false);
+    }
+}
 
 //config
 app.set('view engine','ejs');
 
+app.use(express.static(__dirname + '/public'));
+
 app.use(express.json());
 app.use(express.urlencoded());
+
+app.use(multer({storage : fileStorage , fileFilter : fileFilter}).single('imageUrl'));
 
 app.use(flash());
 
