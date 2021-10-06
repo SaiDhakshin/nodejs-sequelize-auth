@@ -4,7 +4,7 @@
             Products
         </title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
-        <link rel="stylesheet" href="css/style2.css">
+        <link rel="stylesheet" href="css/styles.css">
     </head>
     <body>
         <h2>Products Page</h2>
@@ -25,7 +25,10 @@
                     
                         <li><a href="products/<%= p.id %>"><%= p.title %></a></li>
                         <li><%= p.price %></li>
-                        <li><%= p.imageUrl %></li>
+                        <div class="image">
+                            <li><%= p.imageUrl %></li>
+                            <img  class="image" src="/<%= p.imageUrl %>" alt="<%= p.imageUrl%>">
+                        </div>
                         <li><%= p.description %></li>
                         <form action="/cart" method="POST">
                             <button>Add To Cart</button>
