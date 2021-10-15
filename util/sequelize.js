@@ -15,6 +15,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL,{
   storage : './session.postgres',
   dialectOptions: {
     ssl : true,
+    rejectUnauthorized: false,
     supportBigNumbers: true
   }
 })
