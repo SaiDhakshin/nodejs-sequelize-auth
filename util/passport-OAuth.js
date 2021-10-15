@@ -13,7 +13,8 @@ require('dotenv').config();
 passport.use(new GoogleStrategy({
     clientID:     process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/callback",
+    // callbackURL: "https://localhost:3000/auth/google/callback",
+    callbackURL: "https://boiling-thicket-23526.herokuapp.com/auth/google/callback",
     passReqToCallback   : true
   },
   function(request, accessToken, refreshToken, profile, done) {
