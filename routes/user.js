@@ -18,7 +18,7 @@ function checkNotAuthenticated(req,res,next){
     res.redirect("/login");
 }
 
-router.get("/",checkAuthenticated,(req,res) => {
+router.get("/index",checkAuthenticated,(req,res) => {
     res.render("index");
 })
 
