@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
 
-// const sequelize = new Sequelize('authuser','saidhakshin','qmpzfgh4563',{
+// const sequelize = new Sequelize('authuser','saidhakshin','<password_here>',{
 //     dialect: 'postgres',
 //     host : 'localhost',
 //     storage : './session.postgres',
